@@ -1,0 +1,6 @@
+nnoremap ,r :mak all<CR>:GdbStartLLDB lldb build/src/sdl-project-template<CR>r<CR>
+
+let g:ale_c_build_dir_names = ['./build/']
+let g:clang_compilation_database = './build'
+let g:ale_cpp_clangd_options = "-compile-commands-dir=" . getcwd() . "/build"
+

@@ -1,0 +1,26 @@
+set(MAIN_CPP ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+
+file(GLOB_RECURSE
+  SOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/*.h
+  )
+list(REMOVE_ITEM SOURCES ${MAIN_CPP})
+
+add_executable(${PROJECTNAME} ${MAIN_CPP})
+
+set(LIBNAME ${PROJECTNAME}-lib)
+add_library(${LIBNAME} STATIC ${SOURCES})
+target_include_directories(${LIBNAME}
+  PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${SDL2PP_INCLUDE_DIRS}
+  )
+set_property(TARGET ${LIBNAME} PROPERTY CXX_STANDARD 17)
+
+target_link_libraries(${PROJECTNAME} ${LIBNAME}
+  ${SDL2PP_LIBRARIES}
+  pthread
+  )
+set_property(TARGET ${PROJECTNAME} PROPERTY CXX_STANDARD 17)
+
