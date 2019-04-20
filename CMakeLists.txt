@@ -8,6 +8,8 @@ if(UNIX AND NOT APPLE)
   set(LINUX TRUE)
 endif()
 
+find_package(SDL2pp REQUIRED)
+
 add_subdirectory(src)
 
 if (APPLE)

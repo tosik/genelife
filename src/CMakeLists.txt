@@ -18,6 +18,8 @@ target_include_directories(${LIBNAME}
   )
 set_property(TARGET ${LIBNAME} PROPERTY CXX_STANDARD 17)
 
+message(STATUS "SDL ${SDL2PP_LIBRARIES}")
+
 target_link_libraries(${PROJECTNAME} ${LIBNAME}
   ${SDL2PP_LIBRARIES}
   pthread
