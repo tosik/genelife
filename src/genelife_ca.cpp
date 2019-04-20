@@ -10,7 +10,13 @@ GenelifeCA::GenelifeCA(const int &width, const int &height)
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       auto cell = std::make_shared<Cell>();
-      cell->state = random_engine() % cell->rule.max_state();
+      cell->rule.gene =
+          0b00100000'00000010'00011100'00000000'00000000'00000000'00000000'00000000;
+      if (random_engine() % 2 == 0) {
+        cell->state = cell->rule.max_state() - 1;
+      } else {
+        cell->state = 0;
+      }
       if (cell->is_living())
         cell->rule.is_enabled = true;
       cells.push_back(cell);
@@ -21,7 +27,8 @@ GenelifeCA::GenelifeCA(const int &width, const int &height)
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       auto cell = get_cell(x, y);
-      next_cells.push_back(cell->clone());
+      auto clone = cell->clone();
+      next_cells.push_back(clone);
     }
   }
 }
@@ -90,15 +97,17 @@ void GenelifeCA::step() {
         if (c[4]->is_living()) {
           next_c->state = result;
         } else if (c[4]->is_dying()) {
-          next_c->kill();
+          next_c->state = result;
         } else if (c[4]->is_dead()) {
-          if (result) {
+          if (result > 0) {
             next_c->rule = rule;
-            if (random_engine() % 100 == 0) {
-              next_c->rule.mutate();
-            }
+            // if (random_engine() % 100 == 0) {
+            //  next_c->rule.mutate(random_engine);
+            // }
             next_c->be_born();
           }
+        } else {
+          next_c->kill();
         }
       } else {
         next_c->kill();

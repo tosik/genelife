@@ -38,15 +38,16 @@ int main(int argc, char *argv[]) {
       for (std::size_t x = 0; x < board_width; x++) {
         {
           auto cell = ca.get_cell(x, y);
-          int r, g, b;
-          if (cell->rule.gene == 0) {
-            r = 255;
-            g = 0;
-          } else {
-            r = 0;
-            g = 255;
-          }
-          b = cell->state * 60;
+          // auto r = (cell->rule.gene & 0x0000ff);
+          // auto g = (cell->rule.gene & 0x00ff00) >> 16;
+          // auto b = (cell->rule.gene & 0xff0000) >> 32;
+          auto r = 255;
+          auto g = 255;
+          auto b = 255;
+          auto a = cell->state / (float)cell->rule.max_state();
+          r *= a;
+          g *= a;
+          b *= a;
           if (cell->state == 0) {
             r = g = b = 0;
           }
