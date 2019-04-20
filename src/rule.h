@@ -13,7 +13,7 @@ public:
   bool is_enabled = false;
   std::uint64_t gene = 0;
 
-  void mutate(std::mt19937 &random_engine) {
+  void mutate(std::mt19937_64 &random_engine) {
     // reverse a random bit
     std::uint64_t changing_bit = 1ULL << (random_engine() % 64);
     gene ^= changing_bit;

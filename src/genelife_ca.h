@@ -14,7 +14,7 @@ private:
   std::vector<std::shared_ptr<Cell>> cells;
   std::vector<std::shared_ptr<Cell>> next_cells;
   std::random_device seed_gen;
-  std::mt19937 random_engine;
+  std::mt19937_64 random_engine;
 
 public:
   GenelifeCA(const int &width, const int &height);

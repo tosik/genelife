@@ -38,23 +38,20 @@ int main(int argc, char *argv[]) {
       for (std::size_t x = 0; x < board_width; x++) {
         {
           auto cell = ca.get_cell(x, y);
-          // auto r = (cell->rule.gene & 0x0000ff);
-          // auto g = (cell->rule.gene & 0x00ff00) >> 16;
-          // auto b = (cell->rule.gene & 0xff0000) >> 32;
-          auto r = 255;
-          auto g = 255;
-          auto b = 255;
-          auto a = cell->state / (float)cell->rule.max_state();
+          auto r = (cell->rule.gene & 0x0000'0000'ff00);
+          auto g = (cell->rule.gene & 0x0000'ff00'0000) >> 24;
+          auto b = (cell->rule.gene & 0xff00'0000'0000) >> 48;
+          // r = g = b = 255;
+          auto a = cell->state / (float)cell->rule.max_state() * 10;
           r *= a;
           g *= a;
           b *= a;
-          if (cell->state == 0) {
-            r = g = b = 0;
+          if (cell->state != 0) {
+            renderer.SetDrawColor(r, g, b, 255);
+            renderer.FillRect(x * pixel_size, y * pixel_size,
+                              x * pixel_size + pixel_size - 1,
+                              y * pixel_size + pixel_size - 1);
           }
-          renderer.SetDrawColor(r, g, b, 255);
-          renderer.FillRect(x * pixel_size, y * pixel_size,
-                            x * pixel_size + pixel_size - 1,
-                            y * pixel_size + pixel_size - 1);
         }
       }
     }

@@ -4,11 +4,21 @@
 
 #include <iostream>
 
+#define RULE_D(i)                                                              \
+  if (sum == i && (gene & bd##i) == bd##i) {                                   \
+    return max_state() - 1;                                                    \
+  }
+
+#define RULE_L(i)                                                              \
+  if (sum == i && (gene & bl##i) == bl##i) {                                   \
+    return max_state() - 1;                                                    \
+  }
+
 namespace genelife {
 
 int Rule::max_state() {
   auto mask =
-      0b00000000'00001111'00000000'00000000'00000000'00000000'00000000'00000000;
+      0b00000000'00000011'00000000'00000000'00000000'00000000'00000000'00000000;
   return ((gene & mask) >> (8 * 6)) + 2;
 }
 
@@ -62,139 +72,29 @@ int Rule::run(std::shared_ptr<Cell> c0, std::shared_ptr<Cell> c1,
   constexpr std::uint64_t bl8 = bl0 >> 8;
 
   if (c4->is_dead()) {
-    if (sum == 0 && (gene & bd0) == bd0) {
-      return max_state() - 1;
-    }
-    if (sum == 1 && (gene & bd1) == bd1) {
-      return max_state() - 1;
-    }
-    if (sum == 2 && (gene & bd2) == bd2) {
-      return max_state() - 1;
-    }
-    if (sum == 3 && (gene & bd3) == bd3) {
-      return max_state() - 1;
-    }
-    if (sum == 4 && (gene & bd4) == bd4) {
-      return max_state() - 1;
-    }
-    if (sum == 5 && (gene & bd5) == bd5) {
-      return max_state() - 1;
-    }
-    if (sum == 6 && (gene & bd6) == bd6) {
-      return max_state() - 1;
-    }
-    if (sum == 7 && (gene & bd7) == bd7) {
-      return max_state() - 1;
-    }
-    if (sum == 8 && (gene & bd8) == bd8) {
-      return max_state() - 1;
-    }
+    RULE_D(0);
+    RULE_D(1);
+    RULE_D(2);
+    RULE_D(3);
+    RULE_D(4);
+    RULE_D(5);
+    RULE_D(6);
+    RULE_D(7);
+    RULE_D(8);
   }
   if (c4->is_living()) {
-    if (sum == 0 && (gene & bl0) == bl0) {
-      return max_state() - 1;
-    }
-    if (sum == 1 && (gene & bl1) == bl1) {
-      return max_state() - 1;
-    }
-    if (sum == 2 && (gene & bl2) == bl2) {
-      return max_state() - 1;
-    }
-    if (sum == 3 && (gene & bl3) == bl3) {
-      return max_state() - 1;
-    }
-    if (sum == 4 && (gene & bl4) == bl4) {
-      return max_state() - 1;
-    }
-    if (sum == 5 && (gene & bl5) == bl5) {
-      return max_state() - 1;
-    }
-    if (sum == 6 && (gene & bl6) == bl6) {
-      return max_state() - 1;
-    }
-    if (sum == 7 && (gene & bl7) == bl7) {
-      return max_state() - 1;
-    }
-    if (sum == 8 && (gene & bl8) == bl8) {
-      return max_state() - 1;
-    }
+    RULE_L(0);
+    RULE_L(1);
+    RULE_L(2);
+    RULE_L(3);
+    RULE_L(4);
+    RULE_L(5);
+    RULE_L(6);
+    RULE_L(7);
+    RULE_L(8);
   }
 
   return c4->state - 1;
 }
-
-/*
-int Rule::run(std::shared_ptr<Cell> c0, std::shared_ptr<Cell> c1,
-              std::shared_ptr<Cell> c2, std::shared_ptr<Cell> c3,
-              std::shared_ptr<Cell> c4, std::shared_ptr<Cell> c5,
-              std::shared_ptr<Cell> c6, std::shared_ptr<Cell> c7,
-              std::shared_ptr<Cell> c8) {
-
-  // outer totalistics
-  {
-    int sum = 0;
-    if (c0->is_living())
-      sum++;
-    if (c1->is_living())
-      sum++;
-    if (c2->is_living())
-      sum++;
-    if (c3->is_living())
-      sum++;
-    if (c5->is_living())
-      sum++;
-    if (c6->is_living())
-      sum++;
-    if (c7->is_living())
-      sum++;
-    if (c8->is_living())
-      sum++;
-
-    if ((gene & 1) != 1) {
-      if (c4->is_dead()) {
-        if (sum == 2) {
-          return max_state() - 1;
-        } else {
-          return 0;
-        }
-      }
-
-      if (c4->is_living()) {
-        if (sum == 3 || sum == 4 || sum == 5) {
-          return max_state() - 1;
-        } else {
-          return max_state() - 2;
-        }
-      }
-
-      if (c4->is_dying()) {
-        return c4->state - 1;
-      }
-    } else {
-      if (c4->is_dead()) {
-        if (sum == 3) {
-          return max_state() - 1;
-        } else {
-          return 0;
-        }
-      }
-
-      if (c4->is_living()) {
-        if (sum == 2 || sum == 3) {
-          return max_state() - 1;
-        } else {
-          return max_state() - 2;
-        }
-      }
-
-      if (c4->is_dying()) {
-        return c4->state - 1;
-      }
-    }
-  }
-
-  return 0;
-}
-*/
 
 } // namespace genelife
