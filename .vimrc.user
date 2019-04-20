@@ -1,4 +1,4 @@
-nnoremap ,r :mak all<CR>:GdbStartLLDB lldb build/src/sdl-project-template<CR>r<CR>
+nnoremap ,r :mak all<CR>:GdbStartLLDB lldb build/src/genelife<CR>r<CR>
 
 let g:ale_c_build_dir_names = ['./build/']
 let g:clang_compilation_database = './build'
