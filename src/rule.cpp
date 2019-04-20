@@ -5,21 +5,25 @@
 #include <iostream>
 
 #define RULE_D(i)                                                              \
-  if (sum == i && (gene & bd##i) == bd##i) {                                   \
+  if (sum == i && (rule & bd##i) == bd##i) {                                   \
     return max_state() - 1;                                                    \
   }
 
 #define RULE_L(i)                                                              \
-  if (sum == i && (gene & bl##i) == bl##i) {                                   \
+  if (sum == i && (rule & bl##i) == bl##i) {                                   \
     return max_state() - 1;                                                    \
   }
 
 namespace genelife {
 
+int Rule::index_of_rule() { return gene & 0xf; }
+
 int Rule::max_state() {
+  auto rule = rules[index_of_rule()];
+
   auto mask =
-      0b00000000'00000011'00000000'00000000'00000000'00000000'00000000'00000000;
-  return ((gene & mask) >> (8 * 6)) + 2;
+      0b00000000'00000111'00000000'00000000'00000000'00000000'00000000'00000000;
+  return ((rule & mask) >> (8 * 6)) + 2;
 }
 
 int Rule::run(std::shared_ptr<Cell> c0, std::shared_ptr<Cell> c1,
@@ -27,6 +31,8 @@ int Rule::run(std::shared_ptr<Cell> c0, std::shared_ptr<Cell> c1,
               std::shared_ptr<Cell> c4, std::shared_ptr<Cell> c5,
               std::shared_ptr<Cell> c6, std::shared_ptr<Cell> c7,
               std::shared_ptr<Cell> c8) {
+
+  auto rule = rules[index_of_rule()];
 
   // 8 neighbors outer totalistic
   int sum = 0;

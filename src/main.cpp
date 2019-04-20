@@ -7,10 +7,8 @@
 
 const std::string title = "Genelife";
 constexpr int pixel_size = 4;
-// constexpr std::size_t board_width = 8;
-// constexpr std::size_t board_height = 8;
-constexpr std::size_t board_width = 64 * 4;
-constexpr std::size_t board_height = 64 * 4;
+constexpr std::size_t board_width = 64 * 6;
+constexpr std::size_t board_height = 64 * 6;
 
 int main(int argc, char *argv[]) {
   SDL2pp::SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER |
@@ -38,6 +36,7 @@ int main(int argc, char *argv[]) {
       for (std::size_t x = 0; x < board_width; x++) {
         {
           auto cell = ca.get_cell(x, y);
+          /*
           auto r = (cell->rule.gene & 0x0000'0000'ff00);
           auto g = (cell->rule.gene & 0x0000'ff00'0000) >> 24;
           auto b = (cell->rule.gene & 0xff00'0000'0000) >> 48;
@@ -46,6 +45,11 @@ int main(int argc, char *argv[]) {
           r *= a;
           g *= a;
           b *= a;
+          */
+          int r, g, b;
+          r = cell->rule.index_of_rule() * 16;
+          g = 255 - cell->rule.index_of_rule() * 16;
+          b = cell->rule.index_of_rule() * 16;
           if (cell->state != 0) {
             renderer.SetDrawColor(r, g, b, 255);
             renderer.FillRect(x * pixel_size, y * pixel_size,
