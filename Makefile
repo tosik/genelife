@@ -5,5 +5,5 @@ build/:
 	mkdir -p build
 
 run: all
-	./build/package/ca-art.app/Contents/MacOS/sdl-project-template
+	./build/package/sdl-project-template.app/Contents/MacOS/sdl-project-template
 
