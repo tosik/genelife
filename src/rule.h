@@ -14,9 +14,27 @@ public:
   std::uint64_t gene = 0;
 
   void mutate(std::mt19937_64 &random_engine) {
-    // reverse a random bit
-    std::uint64_t changing_bit = 1ULL << (random_engine() % 64);
-    gene ^= changing_bit;
+    if (random_engine() % 10 > 0) {
+      // reverse a random bit
+      std::uint64_t changing_bit = 1ULL << (random_engine() % 32);
+      gene ^= changing_bit;
+    } else {
+      auto right_bits = gene & 0xffff'ffff;
+      auto left_bits = (gene >> 32) & 0xffff'ffff;
+      gene = left_bits | (right_bits << 32);
+    }
+  }
+
+  void mutate(int timing, std::mt19937_64 &random_engine) {
+    if (timing > 0) {
+      // reverse a random bit
+      std::uint64_t changing_bit = 1ULL << (random_engine() % 32);
+      gene ^= changing_bit;
+    } else {
+      auto right_bits = gene & 0xffff'ffff;
+      auto left_bits = (gene >> 32) & 0xffff'ffff;
+      gene = left_bits | (right_bits << 32);
+    }
   }
 
   int run(std::shared_ptr<Cell> c0, std::shared_ptr<Cell> c1,

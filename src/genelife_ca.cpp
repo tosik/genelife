@@ -10,6 +10,7 @@ GenelifeCA::GenelifeCA(const int &width, const int &height)
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       auto cell = std::make_shared<Cell>();
+      cell->rule.gene = random_engine();
       cell->rule.gene =
           0b00100000'00000010'00011100'00000000'00000000'00000000'00000000'00000000;
       if (random_engine() % 2 == 0) {
@@ -101,9 +102,10 @@ void GenelifeCA::step() {
         } else if (c[4]->is_dead()) {
           if (result > 0) {
             next_c->rule = rule;
-            // if (random_engine() % 100 == 0) {
-            //  next_c->rule.mutate(random_engine);
-            // }
+            if (random_engine() % 100 == 0) {
+              next_c->rule.mutate(random_engine);
+            }
+            // next_c->rule.mutate(steps % 100, random_engine);
             next_c->be_born();
           }
         } else {
@@ -114,6 +116,8 @@ void GenelifeCA::step() {
       }
     }
   }
+
+  steps++;
 }
 
 } // namespace genelife

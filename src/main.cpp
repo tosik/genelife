@@ -6,11 +6,9 @@
 #include "genelife_ca.h"
 
 const std::string title = "Genelife";
-constexpr int pixel_size = 4;
-// constexpr std::size_t board_width = 8;
-// constexpr std::size_t board_height = 8;
-constexpr std::size_t board_width = 64 * 4;
-constexpr std::size_t board_height = 64 * 4;
+constexpr int pixel_size = 3;
+constexpr std::size_t board_width = 64 * 8;
+constexpr std::size_t board_height = 64 * 8;
 
 int main(int argc, char *argv[]) {
   SDL2pp::SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER |
@@ -38,9 +36,9 @@ int main(int argc, char *argv[]) {
       for (std::size_t x = 0; x < board_width; x++) {
         {
           auto cell = ca.get_cell(x, y);
-          auto r = (cell->rule.gene & 0x0000'0000'ff00);
-          auto g = (cell->rule.gene & 0x0000'ff00'0000) >> 24;
-          auto b = (cell->rule.gene & 0xff00'0000'0000) >> 48;
+          auto r = (cell->rule.gene & 0x0000'0000'000f'ffff);
+          auto g = (cell->rule.gene & 0x0000'00ff'fff0'0000) >> 4 * 5;
+          auto b = (cell->rule.gene & 0x0fff'ff00'0000'0000) >> 4 * 10;
           // r = g = b = 255;
           auto a = cell->state / (float)cell->rule.max_state() * 10;
           r *= a;
@@ -57,7 +55,8 @@ int main(int argc, char *argv[]) {
     }
     renderer.Present();
 
-    ca.step();
+    for (int i = 0; i < 1; i++)
+      ca.step();
   }
 
   return 0;
