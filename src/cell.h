@@ -17,7 +17,7 @@ public:
 
   void be_born() {
     if (!is_living())
-      state = rule.max_state - 1;
+      state = rule.max_state() - 1;
     rule.is_enabled = true;
   }
 
@@ -29,8 +29,8 @@ public:
     return dest;
   }
 
-  bool is_living() { return state == rule.max_state - 1; }
-  bool is_dying() { return state < rule.max_state - 1 && !is_dead(); }
+  bool is_living() { return state == rule.max_state() - 1; }
+  bool is_dying() { return state < rule.max_state() - 1 && !is_dead(); }
   bool is_dead() { return state == 0; }
 };
 } // namespace genelife

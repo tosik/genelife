@@ -10,7 +10,7 @@ GenelifeCA::GenelifeCA(const int &width, const int &height)
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       auto cell = std::make_shared<Cell>();
-      cell->state = random_engine() % cell->rule.max_state;
+      cell->state = random_engine() % cell->rule.max_state();
       if (cell->is_living())
         cell->rule.is_enabled = true;
       cells.push_back(cell);
@@ -70,22 +70,6 @@ void GenelifeCA::step() {
       auto next_c = c[4]->clone();
       next_cells[x + y * height] = next_c;
 
-      /*
-      // simple rule
-      Rule rule = c[4]->rule;
-      auto result =
-          rule.run(c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8]);
-      if (c[4]->is_dying()) {
-        next_c->kill();
-      } else {
-        if (result) {
-          next_c->be_born();
-        } else {
-          next_c->kill();
-        }
-      }
-      */
-
       Rule rule;
       if (c[4]->is_living()) {
         rule = c[4]->rule;
@@ -104,15 +88,13 @@ void GenelifeCA::step() {
         auto result =
             rule.run(c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8]);
         if (c[4]->is_living()) {
-          if (!result) {
-            next_c->kill();
-          }
+          next_c->state = result;
         } else if (c[4]->is_dying()) {
           next_c->kill();
         } else if (c[4]->is_dead()) {
           if (result) {
             next_c->rule = rule;
-            if (random_engine() % 1000 == 0) {
+            if (random_engine() % 100 == 0) {
               next_c->rule.mutate();
             }
             next_c->be_born();
