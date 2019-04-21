@@ -97,15 +97,19 @@ void GenelifeCA::step() {
             rule.run(c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8]);
         if (c[4]->is_living()) {
           next_c->state = result;
+          if (next_c->is_living()) {
+            if (random_engine() % 1000 == 0) {
+              next_c->rule.mutate(random_engine);
+            }
+          }
         } else if (c[4]->is_dying()) {
           next_c->state = result;
         } else if (c[4]->is_dead()) {
           if (result > 0) {
             next_c->rule = rule;
-            if (random_engine() % 100 == 0) {
+            if (random_engine() % 1000 == 0) {
               next_c->rule.mutate(random_engine);
             }
-            // next_c->rule.mutate(steps % 100, random_engine);
             next_c->be_born();
           }
         } else {
