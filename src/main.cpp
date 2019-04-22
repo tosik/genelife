@@ -6,9 +6,9 @@
 #include "genelife_ca.h"
 
 const std::string title = "Genelife";
-constexpr int pixel_size = 3;
-constexpr std::size_t board_width = 64 * 8;
-constexpr std::size_t board_height = 64 * 8;
+constexpr int pixel_size = 2;
+constexpr std::size_t board_width = 64 * 4;
+constexpr std::size_t board_height = 64 * 4;
 
 int main(int argc, char *argv[]) {
   SDL2pp::SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER |
@@ -36,26 +36,41 @@ int main(int argc, char *argv[]) {
       for (std::size_t x = 0; x < board_width; x++) {
         {
           auto cell = ca.get_cell(x, y);
-          auto r = (cell->rule.gene & 0x0000'0000'000f'ffff);
-          auto g = (cell->rule.gene & 0x0000'00ff'fff0'0000) >> 4 * 5;
-          auto b = (cell->rule.gene & 0x0fff'ff00'0000'0000) >> 4 * 10;
-          // r = g = b = 255;
-          auto a = cell->state / (float)cell->rule.max_state() * 10;
-          r *= a;
-          g *= a;
-          b *= a;
-          if (cell->state != 0) {
-            renderer.SetDrawColor(r, g, b, 255);
-            renderer.FillRect(x * pixel_size, y * pixel_size,
-                              x * pixel_size + pixel_size - 1,
-                              y * pixel_size + pixel_size - 1);
-          }
+          /*
+          auto r = ((cell->rule.gene & 0x0000'0000'000f'ffff) % 255);
+          auto g = ((cell->rule.gene & 0x0000'00ff'fff0'0000) >> 4 * 5) % 255;
+          auto b = ((cell->rule.gene & 0x0fff'ff00'0000'0000) >> 4 * 10) % 255;
+          */
+          /*
+          auto r = ((cell->rule.gene & 0x0000'0fff) % 255);
+          auto g = ((cell->rule.gene & 0x00ff'f000) >> 4 * 3) % 255;
+          auto b = ((cell->rule.gene & 0xff00'0000) >> 4 * 6) % 255;
+          auto a = (cell->state + 1) / (float)cell->rule.max_state() * 5;
+          r = std::min<int>((int)r * a, 255);
+          g = std::min<int>((int)g * a, 255);
+          b = std::min<int>((int)b * a, 255);
+          */
+          /*
+          int r, g, b;
+          r = g = b = 255;
+          if (cell->state == 0)
+            r = g = b = 0;
+          */
+
+          int r, g, b;
+          r = cell->age % 255;
+          g = (cell->state) * 50;
+          b = (cell->state == 0) ? 0 : 255;
+          renderer.SetDrawColor(r, g, b, 255);
+          renderer.FillRect(x * pixel_size, y * pixel_size,
+                            x * pixel_size + pixel_size - 1,
+                            y * pixel_size + pixel_size - 1);
         }
       }
     }
     renderer.Present();
 
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 10; i++)
       ca.step();
   }
 

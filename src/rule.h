@@ -10,21 +10,10 @@ class Cell;
 class Rule {
 public:
   int max_state();
-  bool is_enabled = false;
   std::uint64_t gene = 0;
 
-  void mutate(std::mt19937_64 &random_engine) {
-    if (random_engine() % 10 > 5) {
-      // reverse a random bit
-      std::uint64_t changing_bit = 1ULL << (random_engine() % 32);
-      gene ^= changing_bit;
-    } else {
-      // exchange hidden bits and using bits
-      std::uint64_t right_bits = gene & 0xffff'ffff;
-      std::uint64_t left_bits = (gene >> 32) & 0xffff'ffff;
-      gene = left_bits | (right_bits << 32);
-    }
-  }
+  void mutate(std::mt19937_64 &random_engine);
+  void mutate(int value);
 
   int run(std::shared_ptr<Cell> c0, std::shared_ptr<Cell> c1,
           std::shared_ptr<Cell> c2, std::shared_ptr<Cell> c3,

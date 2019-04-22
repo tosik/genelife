@@ -7,24 +7,14 @@ namespace genelife {
 class Cell {
 public:
   int state;
+  int age = 0;
   Rule rule;
-
-  void kill() {
-    if (!is_dead())
-      state--;
-    rule.is_enabled = false;
-  }
-
-  void be_born() {
-    if (!is_living())
-      state = rule.max_state() - 1;
-    rule.is_enabled = true;
-  }
 
   std::shared_ptr<Cell> clone() {
     auto dest = std::make_shared<Cell>();
     dest->rule = rule;
     dest->state = state;
+    dest->age = age;
 
     return dest;
   }
