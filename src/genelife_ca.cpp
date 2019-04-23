@@ -169,32 +169,31 @@ void GenelifeCA::step() {
       // 死んだセルが蘇るときにルールを遺伝する
       auto result =
           rule.run(c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8]);
-      next_c->state = result;
-      if (result == c[4]->state && !c[4]->is_dead()) {
-        // next_c->age++;
-      }
-      if (c[4]->is_dead() && !next_c->is_dead()) {
+      if (c[4]->is_dead() && result > 0) {
         next_c->rule = rule;
-        // next_c->age = age;
         next_c->age = age + 1;
-        next_c->state = rule.max_state() - 1;
-      } else if (c[4]->is_dying()) {
+      } else if (c[4]->is_dying() && result > 0) {
         next_c->age++;
       }
-      if (!next_c->is_dead()) {
-        if (false && steps > 300) {
-          next_c->rule.gene = rule.rule_str_to_bits("1/1");
-        } else {
-          bool mutated = next_c->rule.mutate(next_c->age);
-          if (mutated) {
-            if (result == 0)
-              next_c->state = 0;
-            else if (result < next_c->rule.max_state() - 1)
-              next_c->state = next_c->rule.max_state() - 2;
-            else if (result == next_c->rule.max_state() - 1)
-              next_c->state = next_c->rule.max_state() - 1;
+      if (result > 0) {
+        bool mutated = next_c->rule.mutate(next_c->age);
+        if (mutated) {
+          if (result == 0)
+            next_c->state = 0;
+          else if (result < next_c->rule.max_state() - 1)
+            next_c->state = next_c->rule.max_state() - 2;
+          else if (result == next_c->rule.max_state() - 1)
+            next_c->state = next_c->rule.max_state() - 1;
+
+          if (next_c->state >= next_c->rule.max_state()) {
+            printf("OMG");
+            next_c->state = next_c->rule.max_state() - 1;
           }
+        } else {
+          next_c->state = result;
         }
+      } else {
+        next_c->state = result;
       }
       if (next_c->is_dead()) {
         next_c->age = 0;

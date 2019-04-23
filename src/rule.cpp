@@ -100,27 +100,27 @@ bool Rule::mutate(int value) {
                      // R("23/36"), // high life
                      // R("12345/45678/8"), // lava
                      // R("3456/2/6"), // sticks
-                     // R("345/2/4"),  // starwras
-                     // R("345/2/3"), // starwras'
-                     // R("01245678/3/8"),    // meteor guns
-                     // R("345/34/6"),        // prairie on fire
-                     // R("5/345"),           // long life
-                     // R("23/3"),            // conway's game of life
-                     // R("238/357"),         // pseudo life
-                     // R("035678/245678/7"), // glisserati
-                     // R("3467/25/6"),       // worms
-                     // R("245/368"), // move
-                     // R("45/368/8"), //
-                     // R("235678/3678"), // coagulations
-                     // R("1/1"),             // gnarl
-                     // R("035678/245678/5"), // glissergy
-                     // R("1357/1357"),       // replicator
-                     // R("34678/0123478"),   // inverse life
-                     // R("1234/3"),          // mazectric
-                     // R("/234"),            // serviettes
-                     // R("23/23/8"), // belzhab
-                     // R("23/23/3"), //
-                     // R("1/1/3"), // gnarl'
+                     // R("345/2/4"), // starwras
+      // R("345/2/3"), // starwras'
+      // R("01245678/3/8"),    // meteor guns
+      // R("345/34/6"),        // prairie on fire
+      // R("5/345"),           // long life
+      // R("23/3"),            // conway's game of life
+      // R("238/357"),         // pseudo life
+      // R("035678/245678/7"), // glisserati
+      // R("3467/25/6"),       // worms
+      // R("245/368"), // move
+      // R("45/368/8"), //
+      // R("235678/3678"), // coagulations
+      // R("1/1"),             // gnarl
+      // R("035678/245678/5"), // glissergy
+      // R("1357/1357"),       // replicator
+      // R("34678/0123478"),   // inverse life
+      // R("1234/3"),          // mazectric
+      // R("/234"),            // serviettes
+      // R("23/23/8"), // belzhab
+      // R("23/23/3"), //
+      // R("1/1/3"), // gnarl'
   };
 #undef R
 
