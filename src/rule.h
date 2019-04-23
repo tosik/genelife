@@ -11,7 +11,7 @@ class Rule {
 public:
   int max_state();
   std::uint64_t gene = 0;
-  int rule = 0;
+  int type = 0;
 
   void mutate(std::mt19937_64 &random_engine);
   bool mutate(int value);

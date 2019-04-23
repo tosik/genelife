@@ -8,8 +8,8 @@
 
 const std::string title = "Genelife";
 constexpr int pixel_size = 2;
-constexpr std::size_t board_width = 64 * 10;
-constexpr std::size_t board_height = 64 * 10;
+constexpr std::size_t board_width = 64 * 5;
+constexpr std::size_t board_height = 64 * 5;
 
 int main(int argc, char *argv[]) {
   SDL2pp::SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER |
@@ -33,6 +33,10 @@ int main(int argc, char *argv[]) {
 
     renderer.SetDrawColor(0, 0, 0, 255);
     renderer.Clear();
+
+    int living_counter[] = {0, 0, 0, 0, 0, 0, 0, 0};
+    int dying_counter[] = {0, 0, 0, 0, 0, 0, 0, 0};
+
     for (std::size_t y = 0; y < board_height; y++) {
       for (std::size_t x = 0; x < board_width; x++) {
         {
@@ -72,7 +76,7 @@ int main(int argc, char *argv[]) {
               0x0000cc, 0x336600, 0x330033, 0x990000, 0x808080,
           };
           auto color =
-              colors[cell->rule.rule % (sizeof(colors) / sizeof(*colors))];
+              colors[cell->rule.type % (sizeof(colors) / sizeof(*colors))];
           int r = (color & 0xff0000) >> (4 * 4);
           int g = (color & 0x00ff00) >> (4 * 2);
           int b = (color & 0x0000ff) >> (4 * 0);
@@ -82,14 +86,24 @@ int main(int argc, char *argv[]) {
           renderer.FillRect(x * pixel_size, y * pixel_size,
                             x * pixel_size + pixel_size - 1,
                             y * pixel_size + pixel_size - 1);
+
+          if (!cell->is_dead()) {
+            if (cell->is_living())
+              living_counter[cell->rule.type]++;
+            if (cell->is_dying())
+              dying_counter[cell->rule.type]++;
+          }
         }
       }
     }
     renderer.Present();
 
     // SDL_Delay(100);
+    //
     std::stringstream ss;
-    ss << "Genelife " << ca.steps;
+    ss << "Genelife steps=" << ca.steps;
+    for (int i = 0; i < 8; i++)
+      ss << " " << i << "=" << living_counter[i] << "/" << dying_counter[i];
     window.SetTitle(ss.str());
 
     for (int i = 0; i < 1; i++)
