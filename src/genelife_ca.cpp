@@ -10,8 +10,10 @@ GenelifeCA::GenelifeCA(const int &width, const int &height)
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       auto cell = std::make_shared<Cell>();
-      cell->rule.gene = random_engine();
-      if (random_engine() % 2 == 0) {
+      // cell->rule.gene = random_engine();
+      if (random_engine() % 10 == 0) {
+        cell->age = random_engine();
+        cell->rule.mutate(cell->age);
         cell->state = cell->rule.max_state() - 1;
       } else {
         cell->state = 0;
@@ -141,9 +143,14 @@ void GenelifeCA::step() {
         for (auto i = 0; i < 9; i++) {
           if (c[v[i]]->is_living()) {
             rule = c[v[i]]->rule;
-            age = c[v[i]]->age;
           }
         }
+      }
+
+      // 一番年上のセルの年齢を使う
+      for (int i = 0; i < 9; i++) {
+        if (c[i]->is_living())
+          age = std::max<int>(c[i]->age, age);
       }
 
       /*
@@ -164,21 +171,62 @@ void GenelifeCA::step() {
           rule.run(c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8]);
       next_c->state = result;
       if (result == c[4]->state && !c[4]->is_dead()) {
-        next_c->age++;
+        // next_c->age++;
       }
       if (c[4]->is_dead() && !next_c->is_dead()) {
         next_c->rule = rule;
-        next_c->age = age;
-        // next_c->age = age + 1;
+        // next_c->age = age;
+        next_c->age = age + 1;
         next_c->state = rule.max_state() - 1;
+      } else if (c[4]->is_dying()) {
+        next_c->age++;
       }
-      if (result > 0) {
-        next_c->rule.mutate(next_c->age);
+      if (!next_c->is_dead()) {
+        if (false && steps > 300) {
+          next_c->rule.gene = rule.rule_str_to_bits("1/1");
+        } else {
+          bool mutated = next_c->rule.mutate(next_c->age);
+          if (mutated) {
+            if (result == 0)
+              next_c->state = 0;
+            else if (result < next_c->rule.max_state() - 1)
+              next_c->state = next_c->rule.max_state() - 2;
+            else if (result == next_c->rule.max_state() - 1)
+              next_c->state = next_c->rule.max_state() - 1;
+          }
+        }
+      }
+      if (next_c->is_dead()) {
+        next_c->age = 0;
       }
     }
-
-    steps++;
   }
+  steps++;
+
+  /*
+  // 稀に局所ランダマイズされる
+  if (steps > 100) {
+    if (steps % 500 == 0) {
+      printf("randomize\n");
+      auto w = 50;
+      auto h = 50;
+      auto sx = random_engine() % (width - 50);
+      auto sy = random_engine() % (height - 50);
+      for (int y = sy; y < h + sy; y++) {
+        for (int x = sx; x < w + sx; x++) {
+          auto cell = next_cells[x + y * height];
+          if (random_engine() % 5 == 0) {
+            cell->age = random_engine();
+            cell->rule.mutate(cell->age);
+            cell->state = cell->rule.max_state() - 1;
+          } else {
+            cell->state = 0;
+          }
+        }
+      }
+    }
+  }
+  */
 }
 
 } // namespace genelife

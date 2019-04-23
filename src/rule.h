@@ -11,9 +11,11 @@ class Rule {
 public:
   int max_state();
   std::uint64_t gene = 0;
+  int rule = 0;
 
   void mutate(std::mt19937_64 &random_engine);
-  void mutate(int value);
+  bool mutate(int value);
+  std::uint64_t rule_str_to_bits(const std::string &str) const;
 
   int run(std::shared_ptr<Cell> c0, std::shared_ptr<Cell> c1,
           std::shared_ptr<Cell> c2, std::shared_ptr<Cell> c3,

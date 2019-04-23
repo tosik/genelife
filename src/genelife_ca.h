@@ -15,7 +15,6 @@ private:
   std::vector<std::shared_ptr<Cell>> next_cells;
   std::random_device seed_gen;
   std::mt19937_64 random_engine;
-  std::uint64_t steps = 0;
 
 public:
   GenelifeCA(const int &width, const int &height);
@@ -24,6 +23,7 @@ public:
   std::shared_ptr<Cell> get_cell(const int &x, const int &y) const;
 
   void step();
+  std::uint64_t steps = 0;
 };
 } // namespace genelife
 

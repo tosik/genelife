@@ -2,13 +2,14 @@
 #include <SDL2pp/SDL2pp.hh>
 
 #include <cstddef>
+#include <sstream>
 
 #include "genelife_ca.h"
 
 const std::string title = "Genelife";
 constexpr int pixel_size = 2;
-constexpr std::size_t board_width = 64 * 4;
-constexpr std::size_t board_height = 64 * 4;
+constexpr std::size_t board_width = 64 * 10;
+constexpr std::size_t board_height = 64 * 10;
 
 int main(int argc, char *argv[]) {
   SDL2pp::SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER |
@@ -57,10 +58,26 @@ int main(int argc, char *argv[]) {
             r = g = b = 0;
           */
 
+          /*
           int r, g, b;
-          r = cell->age % 255;
-          g = (cell->state) * 50;
+          r = (cell->age / 10) % 255;
+          g = (cell->rule.gene) % 255;
           b = (cell->state == 0) ? 0 : 255;
+          if (cell->state == 0)
+            r = g = b = 0;
+          */
+
+          static int colors[] = {
+              0xffffff, 0xff66ff, 0xffff66, 0x6666ff, 0x66ffb2, 0xcccc00,
+              0x0000cc, 0x336600, 0x330033, 0x990000, 0x808080,
+          };
+          auto color =
+              colors[cell->rule.rule % (sizeof(colors) / sizeof(*colors))];
+          int r = (color & 0xff0000) >> (4 * 4);
+          int g = (color & 0x00ff00) >> (4 * 2);
+          int b = (color & 0x0000ff) >> (4 * 0);
+          if (cell->state == 0)
+            r = g = b = 0;
           renderer.SetDrawColor(r, g, b, 255);
           renderer.FillRect(x * pixel_size, y * pixel_size,
                             x * pixel_size + pixel_size - 1,
@@ -70,7 +87,12 @@ int main(int argc, char *argv[]) {
     }
     renderer.Present();
 
-    for (int i = 0; i < 10; i++)
+    // SDL_Delay(100);
+    std::stringstream ss;
+    ss << "Genelife " << ca.steps;
+    window.SetTitle(ss.str());
+
+    for (int i = 0; i < 1; i++)
       ca.step();
   }
 
