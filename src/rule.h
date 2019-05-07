@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <memory>
 #include <random>
+#include <vector>
 
 namespace genelife {
 class Cell;
@@ -12,6 +13,7 @@ public:
   int max_state();
   std::uint64_t gene = 0;
   int type = 0;
+  std::vector<int> rule_pattern;
 
   void mutate(std::mt19937_64 &random_engine);
   bool mutate(int value);
@@ -22,6 +24,8 @@ public:
           std::shared_ptr<Cell> c4, std::shared_ptr<Cell> c5,
           std::shared_ptr<Cell> c6, std::shared_ptr<Cell> c7,
           std::shared_ptr<Cell> c8);
+
+  std::vector<int> types;
 };
 } // namespace genelife
 

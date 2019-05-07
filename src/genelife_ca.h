@@ -17,13 +17,15 @@ private:
   std::mt19937_64 random_engine;
 
 public:
-  GenelifeCA(const int &width, const int &height);
+  GenelifeCA(const int &width, const int &height,
+             const std::vector<int> &rule_pattern);
 
   int get_state(const int &x, const int &y) const;
   std::shared_ptr<Cell> get_cell(const int &x, const int &y) const;
 
   void step();
   std::uint64_t steps = 0;
+  const std::vector<int> &rule_pattern;
 };
 } // namespace genelife
 

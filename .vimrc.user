@@ -1,6 +1,6 @@
-nnoremap ,r :mak all<CR>:GdbStartLLDB lldb build/src/genelife<CR>r<CR>
+nnoremap ,r :mak all<CR>:GdbStartLLDB lldb build/debug/src/genelife<CR>r<CR>
 
-let g:ale_c_build_dir_names = ['./build/']
-let g:clang_compilation_database = './build'
-let g:ale_cpp_clangd_options = "-compile-commands-dir=" . getcwd() . "/build"
+let g:ale_c_build_dir_names = ['./build/debug/']
+let g:clang_compilation_database = './build/debug'
+let g:ale_cpp_clangd_options = "-compile-commands-dir=" . getcwd() . "/build/debug"
 

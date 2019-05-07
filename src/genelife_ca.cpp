@@ -5,15 +5,18 @@
 
 namespace genelife {
 
-GenelifeCA::GenelifeCA(const int &width, const int &height)
-    : width(width), height(height), random_engine(seed_gen()) {
+GenelifeCA::GenelifeCA(const int &width, const int &height,
+                       const std::vector<int> &rule_pattern)
+    : width(width), height(height), rule_pattern(rule_pattern),
+      random_engine(seed_gen()) {
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       auto cell = std::make_shared<Cell>();
-      // cell->rule.gene = random_engine();
-      if (random_engine() % 10 == 0) {
-        cell->age = random_engine();
-        cell->rule.mutate(cell->age);
+      cell->rule.rule_pattern.resize(rule_pattern.size());
+      std::copy(rule_pattern.begin(), rule_pattern.end(),
+                cell->rule.rule_pattern.begin());
+      cell->rule.mutate(cell->age);
+      if (random_engine() % 2 == 0) {
         cell->state = cell->rule.max_state() - 1;
       } else {
         cell->state = 0;
@@ -21,6 +24,19 @@ GenelifeCA::GenelifeCA(const int &width, const int &height)
       cells.push_back(cell);
     }
   }
+
+  /*
+  auto max = get_cell(10, 10)->rule.max_state() - 1;
+  get_cell(10, 10)->state = max;
+  get_cell(11, 10)->state = max;
+  get_cell(12, 10)->state = max;
+  get_cell(14, 10)->state = max;
+  get_cell(15, 10)->state = max;
+  get_cell(15, 11)->state = max;
+  get_cell(15, 12)->state = max;
+  get_cell(15, 13)->state = max;
+  get_cell(15, 14)->state = max;
+  */
 
   // clone
   for (int y = 0; y < height; y++) {
@@ -59,60 +75,6 @@ void GenelifeCA::step() {
       next_cells[x + y * height] = nullptr;
     }
   }
-
-  /*
-  for (int y = 0; y < height; y++) {
-    for (int x = 0; x < width; x++) {
-      if (random_engine() % 100 == 0) {
-        std::shared_ptr<Cell> c[9];
-        c[0] = get_cell(x - 1, y - 1);
-        c[1] = get_cell(x, y - 1);
-        c[2] = get_cell(x + 1, y - 1);
-        c[3] = get_cell(x - 1, y);
-        c[4] = get_cell(x, y);
-        c[5] = get_cell(x + 1, y);
-        c[6] = get_cell(x - 1, y + 1);
-        c[7] = get_cell(x, y + 1);
-        c[8] = get_cell(x + 1, y + 1);
-
-        c[4]->rule = c[random_engine() % 9]->rule;
-        c[4]->rule.mutate(random_engine);
-      }
-    }
-  }
-  */
-
-  /*
-  // copy rules
-  std::vector<int> r(width * height);
-  std::iota(r.begin(), r.end(), 0);
-  std::shuffle(r.begin(), r.end(), random_engine);
-  for (int yy = 0; yy < height; yy++) {
-    for (int xx = 0; xx < width; xx++) {
-      int x = r[xx + yy * height] % width;
-      int y = r[xx + yy * height] / height;
-      std::shared_ptr<Cell> c[9];
-      c[0] = get_cell(x - 1, y - 1);
-      c[1] = get_cell(x, y - 1);
-      c[2] = get_cell(x + 1, y - 1);
-      c[3] = get_cell(x - 1, y);
-      c[4] = get_cell(x, y);
-      c[5] = get_cell(x + 1, y);
-      c[6] = get_cell(x - 1, y + 1);
-      c[7] = get_cell(x, y + 1);
-      c[8] = get_cell(x + 1, y + 1);
-      if (c[4]->is_living()) {
-        std::vector<int> v(9);
-        std::iota(v.begin(), v.end(), 0);
-        std::shuffle(v.begin(), v.end(), random_engine);
-        for (auto i = 0; i < 9; i++) {
-          if (c[v[i]]->is_dead())
-            c[v[i]]->rule = c[4]->rule;
-        }
-      }
-    }
-  }
-  */
 
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
@@ -153,19 +115,6 @@ void GenelifeCA::step() {
           age = std::max<int>(c[i]->age, age);
       }
 
-      /*
-      // ルールを実行してそのまま反映
-      auto result =
-          rule.run(c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8]);
-      if (result == c[4]->state) {
-        next_c->age++;
-      } else {
-        next_c->age = age;
-      }
-      next_c->state = result;
-      next_c->rule.mutate(next_c->age);
-      */
-
       // 死んだセルが蘇るときにルールを遺伝する
       auto result =
           rule.run(c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8]);
@@ -180,15 +129,8 @@ void GenelifeCA::step() {
         if (mutated) {
           if (result == 0)
             next_c->state = 0;
-          else if (result < next_c->rule.max_state() - 1)
-            next_c->state = next_c->rule.max_state() - 2;
-          else if (result == next_c->rule.max_state() - 1)
+          else
             next_c->state = next_c->rule.max_state() - 1;
-
-          if (next_c->state >= next_c->rule.max_state()) {
-            printf("OMG");
-            next_c->state = next_c->rule.max_state() - 1;
-          }
         } else {
           next_c->state = result;
         }
