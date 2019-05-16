@@ -62,10 +62,11 @@ void Rule::mutate(std::mt19937_64 &random_engine) {
   }
 }
 
-bool Rule::mutate(int value) {
+bool Rule::mutate(int value, bool force) {
 #define R rule_str_to_bits
   static std::uint64_t rules[] = {
-      R("1/1"),             // gnarl
+      // R("2345/4567/2"),     // 自由
+      R("234/4/2"),         // 自由
       R("35/236/3"),        // lava'
       R("1/1/3"),           // gnarl'
       R("245/12/3"),        //
@@ -94,11 +95,15 @@ bool Rule::mutate(int value) {
       R("/234"),            // serviettes
       R("23/23/8"),         // belzhab
       R("23/23/3"),         //
+      R("467/25/4"),        //
+      R("4678/245678/5"),   //
+      R("345/2/6"),         //
+      R("3456/3678/8"),     //
   };
 #undef R
 
   int a = 100;
-  if (value % a == 0) {
+  if ((mutation_enabled && value % a == 0) || force) {
     auto i = (value / a) % rule_pattern.size();
     gene = rules[rule_pattern[i]];
     type = i;
@@ -108,7 +113,7 @@ bool Rule::mutate(int value) {
   return false;
 }
 
-int Rule::max_state() {
+int Rule::max_state() const {
   auto mask =
       0b00000000'00000111'00000000'00000000'00000000'00000000'00000000'00000000;
   return ((gene & mask) >> (8 * 6)) + 2;

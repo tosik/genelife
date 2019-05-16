@@ -18,10 +18,12 @@ private:
 
 public:
   GenelifeCA(const int &width, const int &height,
-             const std::vector<int> &rule_pattern);
+             const std::vector<int> &rule_pattern, int consistency);
 
   int get_state(const int &x, const int &y) const;
   std::shared_ptr<Cell> get_cell(const int &x, const int &y) const;
+  std::shared_ptr<Cell> get_relative_cell(const int &x, const int &y,
+                                          std::shared_ptr<Cell> base) const;
 
   void step();
   std::uint64_t steps = 0;

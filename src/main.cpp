@@ -12,9 +12,15 @@ const std::string title = "Genelife";
 int main(int argc, char *argv[]) {
   bool headless = false;
   if (!headless) {
-    constexpr int pixel_size = 2;
-    constexpr std::size_t board_width = 64 * 10;
-    constexpr std::size_t board_height = 64 * 10;
+    constexpr int pixel_size = 3;
+    constexpr std::size_t board_width = 64 * 4;
+    constexpr std::size_t board_height = board_width;
+    constexpr int consistency = 10;
+
+    std::vector<int> rule_pattern = {0};
+    genelife::GenelifeCA ca(board_width, board_height, rule_pattern,
+                            consistency);
+
     SDL2pp::SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER |
                     SDL_INIT_EVENTS);
     SDL2pp::Window window(title, SDL_WINDOWPOS_UNDEFINED,
@@ -22,10 +28,6 @@ int main(int argc, char *argv[]) {
                           board_height * pixel_size, 0);
     SDL2pp::Renderer renderer(
         window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
-    // std::vector<int> rule_pattern = {9, 8, 7};
-    std::vector<int> rule_pattern = {15, 6};
-    genelife::GenelifeCA ca(board_width, board_height, rule_pattern);
 
     while (true) {
       SDL_Event event;
@@ -36,6 +38,7 @@ int main(int argc, char *argv[]) {
         }
       }
 
+      renderer.SetDrawBlendMode(SDL_BLENDMODE_BLEND);
       renderer.SetDrawColor(0, 0, 0, 255);
       renderer.Clear();
 
@@ -43,53 +46,14 @@ int main(int argc, char *argv[]) {
         for (std::size_t x = 0; x < board_width; x++) {
           {
             auto cell = ca.get_cell(x, y);
-            /*
-            auto r = ((cell->rule.gene & 0x0000'0000'000f'ffff) % 255);
-            auto g = ((cell->rule.gene & 0x0000'00ff'fff0'0000) >> 4 * 5) %
-            255; auto b = ((cell->rule.gene & 0x0fff'ff00'0000'0000) >> 4 *
-            10) % 255;
-            */
-            /*
-            auto r = ((cell->rule.gene & 0x0000'0fff) % 255);
-            auto g = ((cell->rule.gene & 0x00ff'f000) >> 4 * 3) % 255;
-            auto b = ((cell->rule.gene & 0xff00'0000) >> 4 * 6) % 255;
-            auto a = (cell->state + 1) / (float)cell->rule.max_state() * 5;
-            r = std::min<int>((int)r * a, 255);
-            g = std::min<int>((int)g * a, 255);
-            b = std::min<int>((int)b * a, 255);
-            */
-            /*
             int r, g, b;
-            r = g = b = 255;
-            if (cell->state == 0)
-              r = g = b = 0;
+            /*
+            r = g = b = cell->state * 255 / cell->rule.max_state();
             */
 
-            /*
-            int r, g, b;
-            r = (cell->age / 10) % 255;
-            g = (cell->rule.gene) % 255;
-            b = (cell->state == 0) ? 0 : 255;
-            if (cell->state == 0)
-              r = g = b = 0;
-            */
-
-            /*
-            int r, g, b;
-            r = cell->state == 1 ? 255 : 0;
-            g = cell->state == 2 ? 255 : 0;
-            b = cell->state == 3 ? 255 : 0;
-            */
-
-            static int colors[] = {
-                0xffffff, 0xff66ff, 0xffff66, 0x6666ff, 0x66ffb2, 0xcccc00,
-                0x0000cc, 0x336600, 0x330033, 0x990000, 0x808080,
-            };
-            auto color =
-                colors[cell->rule.type % (sizeof(colors) / sizeof(*colors))];
-            int r = (color & 0xff0000) >> (4 * 4);
-            int g = (color & 0x00ff00) >> (4 * 2);
-            int b = (color & 0x0000ff) >> (4 * 0);
+            r = cell->state * 255 / cell->rule.max_state();
+            g = (cell->vx + 1) * 64;
+            b = (cell->vy + 1) * 64;
 
             if (cell->state > 0) {
               renderer.SetDrawColor(r, g, b, 255);
@@ -100,6 +64,58 @@ int main(int argc, char *argv[]) {
           }
         }
       }
+
+      /*
+      static auto func = [](int x) {
+        if (x % 2 >= 1) {
+          return x - 1;
+        } else {
+          return x + 1;
+        }
+      };
+
+      renderer.SetDrawBlendMode(SDL_BLENDMODE_ADD);
+      for (std::size_t y = 0; y < board_height; y++) {
+        for (std::size_t x = 0; x < board_width; x++) {
+          int xx = func(x);
+          int yy = func(y);
+          auto cell = ca.get_cell(xx % board_width, yy % board_height);
+          int r, g, b;
+          r = g = b = cell->state * 255 / cell->rule.max_state();
+
+          if (cell->state > 0) {
+            renderer.SetDrawColor(r, g, b, 255);
+            renderer.FillRect(x * pixel_size, y * pixel_size,
+                              x * pixel_size + pixel_size - 1,
+                              y * pixel_size + pixel_size - 1);
+          }
+        }
+      }
+      */
+
+      /*
+      renderer.SetDrawBlendMode(SDL_BLENDMODE_ADD);
+      for (std::size_t x = 0; x < board_width; x++) {
+        int sum = 0;
+        for (std::size_t y = 0; y < board_height; y++) {
+          auto cell = ca.get_cell(x, y);
+          if (cell->is_living())
+            sum++;
+        }
+
+        for (std::size_t yy = 0; yy < board_height; yy++) {
+          if (sum > yy)
+            renderer.SetDrawColor(255, 0, 0, 255);
+          else
+            renderer.SetDrawColor(0, 0, 0, 255);
+          int y = board_height - yy;
+          renderer.FillRect(x * pixel_size, y * pixel_size,
+                            x * pixel_size + pixel_size - 1,
+                            y * pixel_size + pixel_size - 1);
+        }
+      }
+      */
+
       renderer.Present();
 
       // SDL_Delay(100);
@@ -109,12 +125,13 @@ int main(int argc, char *argv[]) {
 
       window.SetTitle(ss.str());
 
-      for (int i = 0; i < 2; i++)
+      for (int i = 0; i < 1; i++)
         ca.step();
     }
   } else {
     constexpr std::size_t board_width = 64 * 2;
     constexpr std::size_t board_height = 64 * 2;
+    constexpr int consistency = 10;
     std::cout << "Start headless mode" << std::endl;
 
     for (int base_mode = 0; base_mode < 29; base_mode++) {
@@ -132,7 +149,8 @@ int main(int argc, char *argv[]) {
         std::vector<std::thread> threads;
         for (int s = 0; s < total; s++) {
           threads.push_back(std::thread([&] {
-            genelife::GenelifeCA ca(board_width, board_height, rule_pattern);
+            genelife::GenelifeCA ca(board_width, board_height, rule_pattern,
+                                    consistency);
 
             int num_of_living_zero = 0;
             int num_of_dying_zero = 0;

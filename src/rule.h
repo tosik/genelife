@@ -10,13 +10,14 @@ namespace genelife {
 class Cell;
 class Rule {
 public:
-  int max_state();
+  int max_state() const;
   std::uint64_t gene = 0;
   int type = 0;
   std::vector<int> rule_pattern;
+  bool mutation_enabled = false;
 
   void mutate(std::mt19937_64 &random_engine);
-  bool mutate(int value);
+  bool mutate(int value, bool force = false);
   std::uint64_t rule_str_to_bits(const std::string &str) const;
 
   int run(std::shared_ptr<Cell> c0, std::shared_ptr<Cell> c1,
