@@ -65,8 +65,7 @@ void Rule::mutate(std::mt19937_64 &random_engine) {
 bool Rule::mutate(int value, bool force) {
 #define R rule_str_to_bits
   static std::uint64_t rules[] = {
-      // R("2345/4567/2"),     // 自由
-      R("234/4/2"),         // 自由
+      R("3456/2/6"),        // 自由
       R("35/236/3"),        // lava'
       R("1/1/3"),           // gnarl'
       R("245/12/3"),        //

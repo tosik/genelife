@@ -28,7 +28,7 @@ public:
   bool is_dying() const { return state < rule.max_state() - 1 && !is_dead(); }
   bool is_dead() const { return state == 0; }
 
-  bool is_sleeping() const { return false && age % sleep_hours != 0; }
+  bool is_sleeping() const { return age % sleep_hours != 0; }
 
   double get_vx() const {
     if (is_living())

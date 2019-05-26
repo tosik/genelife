@@ -12,7 +12,7 @@ GenelifeCA::GenelifeCA(const int &width, const int &height,
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       auto cell = std::make_shared<Cell>();
-      cell->sleep_hours = random_engine() % 2 + 1;
+      cell->sleep_hours = random_engine() % 10 + 1;
       cell->rule.rule_pattern.resize(rule_pattern.size());
       std::copy(rule_pattern.begin(), rule_pattern.end(),
                 cell->rule.rule_pattern.begin());
@@ -27,19 +27,17 @@ GenelifeCA::GenelifeCA(const int &width, const int &height,
   }
 
   for (int i = 0; i < 10; i++) {
-    auto rvx = (int)(random_engine() % 3) - 1;
-    auto rvy = (int)(random_engine() % 3) - 1;
-    auto w = 50;
-    auto h = 50;
+    auto rvx = (int)(random_engine() % 5) - 2;
+    auto rvy = (int)(random_engine() % 5) - 2;
+    auto w = 200;
+    auto h = 200;
     auto sx = random_engine() % (width - 50);
     auto sy = random_engine() % (height - 50);
     for (int y = sy; y < h + sy; y++) {
       for (int x = sx; x < w + sx; x++) {
         auto cell = get_cell(x, y);
-        if (cell->is_living()) {
-          cell->vx = rvx;
-          cell->vy = rvy;
-        }
+        cell->vx = rvx;
+        cell->vy = rvy;
       }
     }
   }
@@ -89,11 +87,9 @@ void GenelifeCA::step() {
     }
   }
 
-  constexpr int threshold = 40;
+  constexpr int threshold = 20;
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      int random_age = random_engine() % 10;
-
       std::shared_ptr<Cell> c[9];
       if (steps <= threshold) {
         c[4] = get_cell(x, y);
@@ -101,15 +97,6 @@ void GenelifeCA::step() {
         auto original_c = get_cell(x, y);
         c[4] = get_relative_cell(x, y, original_c);
       }
-
-      /*
-      if (c[4]->is_sleeping() && !c[4]->is_dying()) {
-        c[4]->age += random_age;
-        auto next_c = c[4]->clone();
-        next_cells[x + y * height] = next_c;
-        continue;
-      }
-      */
 
       c[0] = get_cell(x - 1, y - 1);
       c[1] = get_cell(x, y - 1);
@@ -121,26 +108,7 @@ void GenelifeCA::step() {
       c[8] = get_cell(x + 1, y + 1);
 
       if (steps > threshold) {
-        std::shared_ptr<Cell> cell;
-        auto original = get_cell(x, y);
-        if (original->is_dead()) {
-          cell = std::make_shared<Cell>();
-          cell->vx = cell->vy = 0;
-          int count = 0;
-          for (int i = 0; i < 9; i++) {
-            if (c[i]->is_living() && i != 4) {
-              cell->vx += c[i]->vx;
-              cell->vy += c[i]->vy;
-              count++;
-            }
-          }
-          if (count > 0) {
-            cell->vx /= count;
-            cell->vy /= count;
-          }
-        } else {
-          cell = original;
-        }
+        auto cell = c[4];
 
         c[0] = get_relative_cell(x - 1, y - 1, cell);
         c[1] = get_relative_cell(x, y - 1, cell);
@@ -152,73 +120,76 @@ void GenelifeCA::step() {
         c[8] = get_relative_cell(x + 1, y + 1, cell);
       }
 
-      /*
-      // disturbance
-      if ((((steps + 500) / 500) % 2 == 0) && random_engine() % 500 == 0) {
-        for (int a = 0; a < 10; a++) {
-          int i = random_engine() % 9;
-          auto noise = c[i]->clone();
-          noise->state =
-              random_engine() % 2 == 0 ? noise->rule.max_state() - 1 : 0;
-          c[i] = noise;
-        }
-      }
-      */
-
       auto next_c = c[4]->clone();
       next_cells[x + y * height] = next_c;
+      next_c->vx = get_cell(x, y)->vx;
+      next_c->vy = get_cell(x, y)->vy;
 
       auto rule = c[4]->rule;
       auto result =
           rule.run(c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8]);
       next_c->state = result;
-      next_c->age += random_age;
-      if (false && next_c->is_living() && c[4]->is_dead()) {
+      next_c->age += 1;
+      if (next_c->is_living()) {
         next_c->vx = next_c->vy = 0;
-
         int count = 0;
         for (int i = 0; i < 9; i++) {
-          if (c[i]->is_living() && i != 4) {
+          if (i != 4) {
             next_c->vx += c[i]->vx;
             next_c->vy += c[i]->vy;
             count++;
           }
         }
-
         if (count > 0) {
           next_c->vx /= count;
           next_c->vy /= count;
         }
+
+        /*
+        double b = -0.3;
+        if (c[0]->is_living()) {
+          next_c->vx += b;
+          next_c->vy += b;
+        }
+        if (c[1]->is_living()) {
+          next_c->vy += b;
+        }
+        if (c[2]->is_living()) {
+          next_c->vx -= b;
+          next_c->vy += b;
+        }
+        if (c[3]->is_living()) {
+          next_c->vx += b;
+        }
+        if (c[5]->is_living()) {
+          next_c->vx -= b;
+        }
+        if (c[6]->is_living()) {
+          next_c->vx += b;
+          next_c->vy -= b;
+        }
+        if (c[7]->is_living()) {
+          next_c->vy -= b;
+        }
+        if (c[8]->is_living()) {
+          next_c->vx -= b;
+          next_c->vy -= b;
+        }
+
+        if (next_c->vx > 1)
+          next_c->vx = 1;
+        if (next_c->vy > 1)
+          next_c->vy = 1;
+        if (next_c->vx < -1)
+          next_c->vx = -1;
+        if (next_c->vy < -1)
+          next_c->vy = -1;
+          */
       }
     }
   }
 
   steps++;
-
-  /*
-  // 稀に局所ランダマイズされる
-  if (steps > 100) {
-    if (steps % 500 == 0) {
-      printf("randomize\n");
-      auto w = 50;
-      auto h = 50;
-      auto sx = random_engine() % (width - 50);
-      auto sy = random_engine() % (height - 50);
-      for (int y = sy; y < h + sy; y++) {
-        for (int x = sx; x < w + sx; x++) {
-          auto cell = next_cells[x + y * height];
-          if (random_engine() % 5 == 0) {
-            cell->age = random_engine();
-            cell->rule.mutate(cell->age);
-            cell->state = cell->rule.max_state() - 1;
-          } else {
-            cell->state = 0;
-          }
-        }
-      }
-    }
-  }
-  */
 }
 
 } // namespace genelife

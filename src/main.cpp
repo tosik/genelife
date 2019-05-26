@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   bool headless = false;
   if (!headless) {
     constexpr int pixel_size = 3;
-    constexpr std::size_t board_width = 64 * 4;
+    constexpr std::size_t board_width = 64 * 10;
     constexpr std::size_t board_height = board_width;
     constexpr int consistency = 10;
 
@@ -52,10 +52,10 @@ int main(int argc, char *argv[]) {
             */
 
             r = cell->state * 255 / cell->rule.max_state();
-            g = (cell->vx + 1) * 64;
-            b = (cell->vy + 1) * 64;
+            g = abs(cell->vx) * 15;
+            b = abs(cell->vy) * 15;
 
-            if (cell->state > 0) {
+            if (true || cell->state > 0) {
               renderer.SetDrawColor(r, g, b, 255);
               renderer.FillRect(x * pixel_size, y * pixel_size,
                                 x * pixel_size + pixel_size - 1,
